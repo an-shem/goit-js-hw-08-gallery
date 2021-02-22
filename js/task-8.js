@@ -1,10 +1,13 @@
 import gallery from './gallery-items.js';
 
+let index = -1;
+let indexImg = 0;
 const ulGalleryRef = document.querySelector('.js-gallery');
 const modalRef = document.querySelector('.js-lightbox');
 const imgModalRef = document.querySelector('.lightbox__image');
 const btnCloseRef = document.querySelector('.lightbox__button');
 const divOverlayRef = document.querySelector('.lightbox__overlay');
+const arrBigImgRef = gallery.map(obj => obj.original);
 
 const arrElemGalleryRefes = gallery.map(obj => {
   // Создали элементы
@@ -18,6 +21,7 @@ const arrElemGalleryRefes = gallery.map(obj => {
   imgRef.setAttribute('class', 'gallery__image');
   imgRef.setAttribute('src', `${obj.preview}`);
   imgRef.setAttribute('data-source', `${obj.original}`);
+  imgRef.setAttribute('data-index', `${(index += 1)}`);
   imgRef.setAttribute('alt', `${obj.description}`);
   // Влаживаем  теги
   aRef.appendChild(imgRef);
@@ -25,6 +29,7 @@ const arrElemGalleryRefes = gallery.map(obj => {
 
   return liRef;
 });
+
 ulGalleryRef.append(...arrElemGalleryRefes);
 
 ulGalleryRef.addEventListener('click', onOpenModal);
@@ -34,21 +39,30 @@ divOverlayRef.addEventListener('click', onCloseModal);
 function onOpenModal(event) {
   event.preventDefault();
   if (!event.target.classList.contains('gallery__image')) return;
-  window.addEventListener('keydown', onCloseEsc);
+  window.addEventListener('keydown', onKeyDown);
   modalRef.classList.add('is-open');
-  imgModalRef.src = event.target.dataset.source;
-  imgModalRef.alt = event.target.alt;
+  indexImg = Number(event.target.dataset.index);
+  imgModalRef.src = arrBigImgRef[indexImg];
 }
 
 function onCloseModal() {
-  window.removeEventListener('keydown', onCloseEsc);
+  window.removeEventListener('keydown', onKeyDown);
   modalRef.classList.remove('is-open');
   imgModalRef.src = '';
-  imgModalRef.alt = '';
 }
 
-function onCloseEsc(event) {
+function onKeyDown(event) {
   if (event.code === 'Escape') {
     onCloseModal();
+  }
+  if (event.code === 'ArrowLeft') {
+    if (indexImg === 0) return;
+    indexImg -= 1;
+    imgModalRef.src = arrBigImgRef[indexImg];
+  }
+  if (event.code === 'ArrowRight') {
+    if (indexImg === arrBigImgRef.length - 1) return;
+    indexImg += 1;
+    imgModalRef.src = arrBigImgRef[indexImg];
   }
 }
