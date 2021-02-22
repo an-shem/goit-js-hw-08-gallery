@@ -34,12 +34,21 @@ divOverlayRef.addEventListener('click', onCloseModal);
 function onOpenModal(event) {
   event.preventDefault();
   if (!event.target.classList.contains('gallery__image')) return;
+  window.addEventListener('keydown', onCloseEsc);
   modalRef.classList.add('is-open');
   imgModalRef.src = event.target.dataset.source;
   imgModalRef.alt = event.target.alt;
 }
+
 function onCloseModal() {
+  window.removeEventListener('keydown', onCloseEsc);
   modalRef.classList.remove('is-open');
   imgModalRef.src = '';
   imgModalRef.alt = '';
+}
+
+function onCloseEsc(event) {
+  if (event.code === 'Escape') {
+    onCloseModal();
+  }
 }
